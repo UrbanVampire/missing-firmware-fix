@@ -132,7 +132,6 @@ fi
 #
 # Let's see if the system is 32 or 64 bit
 SysArch=$(arch)
-#SysArch='i386'
 if [[ $DEBUG -eq 1 ]]; then
     case $SysArch in
         "x86_64" )
