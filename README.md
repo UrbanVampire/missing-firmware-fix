@@ -26,10 +26,16 @@ Tested on Debian 9, Debian 10, Ubuntu 18.04, Ubuntu 20.04, Linux Mint 20.01.
 
 Итак, вы получили сообщение "Possible Missing Firmware" при генерации ядра во время обновления системы или при вызове `update-initramfs`. Проблема нередкая, но решение есть.
 
-Использовать скрипт очень просто: качаете, делаете исполняемым и запускаете с правами sudo:
+Использовать скрипт очень просто. Качаете:
 ```
 wget https://raw.githubusercontent.com/UrbanVampire/missing-firmware-fix/main/missing-firmware-fix.sh
+```
+делаете исполняемым:
+```
 chmod +x missing-firmware-fix.sh
+```
+и запускаете с правами sudo:
+```
 sudo ./missing-firmware-fix.sh
 ```
 Если что-то пошло не так, можно запустить скрипт с ключом **'--debug'** для получения расширенной информации об ошибках:
