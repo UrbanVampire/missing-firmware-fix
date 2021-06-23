@@ -3,7 +3,7 @@
 
 ### English readme
 
-So, you're faced the "Possible Missing Firmware" message when generating a kernel on your Linux system during system update or when generating a kernel during a system update or when calling update-initramfs. This is a fairly common problem and this script is the solution.
+So, you're faced the "Possible Missing Firmware" message when generating a kernel on your Linux system during apt updgrade or update-initramfs. This is a fairly common problem and this script is the solution.
 
 The usage is very simple: just download the script, make it executable and run as sudo:
 ```
