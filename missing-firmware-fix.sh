@@ -135,11 +135,11 @@ SysArch=$(arch)
 if [[ $DEBUG -eq 1 ]]; then
     case $SysArch in
         "x86_64" )
-            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch (64-bit)${NL}";;
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(64-bit).${NL}";;
         "i686"|"i386"  )
-            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch (32-bit)${NL}";;
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(32-bit).${NL}";;
         * )
-            echo -e "${YELLOW}DEBUG WARNING: ${BLUE}Unknown system architecture ${CYAN}$SysArch${NL}"
+            echo -e "${YELLOW}DEBUG WARNING: ${BLUE}Unknown system architecture ${CYAN}$SysArch${BLUE}.${NL}"
     esac
 fi
 # Here we call update-initramfs, grep-search it's output for "missing HW" message
