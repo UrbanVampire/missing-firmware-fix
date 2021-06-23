@@ -3,7 +3,7 @@
 
 ### English readme
 
-So, you're faced the "Possible Missing Firmware" message during kernel generation on your Linux system. This is a fairly common problem and this script is the solution.
+So, you're faced the "Possible Missing Firmware" message when generating a kernel on your Linux system during system update or when generating a kernel during a system update or when calling update-initramfs. This is a fairly common problem and this script is the solution.
 
 The usage is very simple: just download the script, make it executable and run as sudo:
 ```
@@ -18,7 +18,7 @@ Tested on Debian 9, Debian 10, Ubuntu 18.04, Ubuntu 20.04, Linux Mint 20.01.
 
 ### Русская инструкция
 
-Итак, вы получили сообщение "Possible Missing Firmware" при генерации ядра. Проблема нередкая, но решение есть.
+Итак, вы получили сообщение "Possible Missing Firmware" при генерации ядра во время обновления системы или при вызове update-initramfs. Проблема нередкая, но решение есть.
 
 Использовать скрипт очень просто: качаете, делаете исполняемым и запускаете с правами sudo:
 ```
