@@ -130,6 +130,19 @@ else
     echo -e "${NL}${CYAN}Hint: ${WHITE}You can use the${GREEN} --debug ${WHITE}option for extended error info.${NC}${NL}"
 fi
 #
+# Let's see if the system is 32 or 64 bit
+SysArch=$(arch)
+#SysArch='i386'
+if [[ $DEBUG -eq 1 ]]; then
+    case $SysArch in
+        "x86_64" )
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch (64-bit)${NL}";;
+        "i686"|"i386"  )
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch (32-bit)${NL}";;
+        * )
+            echo -e "${YELLOW}DEBUG WARNING: ${BLUE}Unknown system architecture ${CYAN}$SysArch${NL}"
+    esac
+fi
 # Here we call update-initramfs, grep-search it's output for "missing HW" message
 echo -e "${BLUE}Detecting missing FWs. It could take some time, please wait...${NC}${NL}"
 MFWs=$(update-initramfs -u 2>&1 >/dev/null | grep 'Possible missing firmware' | sed -n 's/ for.*$//p') 
