@@ -1,6 +1,6 @@
 # Automatic "Possible missing firmware" warning fix.
 ## English readme.
-[:arrow_down: Инструкция на русском ниже.](##Русская-инструкция.)
+[:arrow_down: Инструкция на русском ниже.](##русская-инструкция.)
 
 So, you're faced the "Possible Missing Firmware" message when generating a kernel on your Linux system during `apt updgrade` or `update-initramfs`. This is a fairly common problem and this script is the solution. It detects all missing firmware, downloads and installs them.
 
@@ -23,7 +23,7 @@ Tested on Debian 9, Debian 10, Ubuntu 18.04, Ubuntu 20.04, Linux Mint 20.01.
 
 # Автоматическое исправление предупреждений "Possible missing firmware".
 ## Русская инструкция
-[:arrow_up:English readme is above.](##English-readme.)
+[:arrow_up:English readme is above.](##english-readme.)
 
 Итак, вы получили сообщение "Possible Missing Firmware" при генерации ядра во время обновления системы или при вызове `update-initramfs`. Проблема нередкая, но решение есть. Этот скрипт определяет все недостающие прошивки, скачивает их и устанавливает.
 
