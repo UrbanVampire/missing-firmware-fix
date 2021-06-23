@@ -48,9 +48,10 @@ function DebuggedExec(){
 #
 # Function to process single missing FW
 function ProcessFirmware(){
-    #
+#
     # Make sure that we have an parameter
     if [[ $# -eq 0 ]]; then echo -e "${NL}${RED}ProcessFirmware function called w/o parameters. Something went really wrong...${NC}${NL}"; return 1; fi
+    if [[ $1 == '' ]]; then return 0; fi # Got an empty line, nothing to do
     #
     ((FWTotal++))		# We got a missing FW, let's count it.
     #
@@ -68,11 +69,6 @@ function ProcessFirmware(){
         echo -e "${CYAN}Alredy installed, Skipping${NC}"
         return 0
     else
-        # Moved this line here to avoid printing blank '$FWFileName' value when already installed
-        # And then output something like ": Alredy installed, Skipping", with an extra ": "
-        # Because '$FWFileName' is not set as nothing is missing.
-        #
-        # Maybe we should move the text "Alredy installed, Skipping" somewhere else?
         echo -ne "${GREEN}$FWFileName${BLUE}:${TAB}${NC}\033[50D\033[${TABoff}C"
     fi	
     echo -ne "${BLUE}Downloading... ${NC}"
@@ -145,7 +141,7 @@ while IFS= read -r line; do if [[ ${#line} -gt $MaxLength ]]; then MaxLength=${#
 while IFS= read -r line; do ProcessFirmware "$line"; done < <(echo "$MFWs")
 #
 # Did we found some missing FWs?
-if [[ $FWTotal -eq 0 ]]; then echo -e "$${BLUE}No missing FWs found. Nothing to do. Exiting...${NC}${NL}"; exit 0; fi
+if [[ $FWTotal -eq 0 ]]; then echo -e "${BLUE}No missing FWs found. Nothing to do. Exiting...${NC}${NL}"; exit 0; fi
 # Is there some successful FWs?
 if [[ $FWSuccs -eq 0 ]]; then		# Nope, no luck
     echo -ne "${NL}${YELLOW}WARNING: No FWs found or downloaded. See messages above"
