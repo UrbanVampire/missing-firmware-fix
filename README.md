@@ -4,5 +4,8 @@ So, you're faced the "Possible Missing Firmware" message during kernel generatio
 The usage is very simple: just download the script, make it executable and run it as sudo:
 
 wget https://raw.githubusercontent.com/UrbanVampire/missing-firmware-fix/main/missing-firmware-fix.sh
+
 chmod +x missing-firmware-fix.sh
+
 'sudo ./missing-firmware-fix.sh'
+
