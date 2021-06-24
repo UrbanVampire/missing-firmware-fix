@@ -7,6 +7,7 @@
 # Improved script colors and suggested handling missing nVidia firmware files by Jiab77 <jiab77@pm.me>, 2021
 # Automagical missing nVidia firmware installation added by UrbanVampire <bgg@ngs.ru>, 2021
 # Minor spellchecking and fixing, minor display fixes and credits added by Jiab77 <jiab77@pm.me>, 2021
+# 32-bit architecture nVidia support and little nVidia help message added by UrbanVampire <bgg@ngs.ru>, 2021
 #
 # Some definitions
 # Config
@@ -14,6 +15,7 @@ DEBUG=0     # Debug flag
 FWTotal=0   # Total missing FWs counter
 FWSuccs=0   # Succesful installed FWs counter
 FWError=0   # Failed FWs
+NVidiaErr=0 # nVidia Error Flag
 declare -a InstalledFWs	# Array to store and check alredy installed FWs
 # Colors:
 RED="\033[1;31m"
@@ -76,15 +78,33 @@ function ProcessFirmware(){
     #
     # Is it nVidia?
     if [[ "$FWFileName" == *"nvidia"* ]]; then
-        echo -ne "${CYAN}nVidia FW detected. It could take some time.${NL}\033[50D\033[${TABoff}CPlease wait... ${NC}"
+        echo -ne "${CYAN}nVidia FW detected. ${NC}"
+        #
+        #   Maybe (just maybe) we could use FW files from 64-bit installer on 32-bit system.
+        #   But rught now I do not know the way to extract files from 64-bit nVidia installer on 32-bit system.
+        #   So right now we just try to download from "Linux-x86" if we are 32.
+        #
+        case $SysArch in    # What is system architecture?
+            "x86_64" )
+                URLBASE="https://download.nvidia.com/XFree86/Linux-x86_64";;
+            "i686"|"i386"  )
+                URLBASE="https://download.nvidia.com/XFree86/Linux-x86";;
+            * )
+                echo -e "${NL}\033[50D\033[${TABoff}C${RED}ERROR: ${YELLOW}Unknown system architecture ${CYAN}$SysArch${YELLOW}.${NC}"
+                ((FWError++))
+                NVidiaErr=1     # Up nVidia error flag
+                return 1
+                ;;
+        esac
+        echo -ne "${NL}\033[50D\033[${TABoff}C${CYAN}It could take some time. Please wait... ${NC}${NL}\033[50D\033[${TABoff}C"
         NVVersion=$(echo $FWFileName | sed -n 's/^.*nvidia\///p'| sed -n 's/\/.*$//p') # Extract version
         FolderNam="NVIDIA-Linux-x86_64-$NVVersion"
         RunFlName="$FolderNam.run"
         NVFWFlNme=$(echo $FWFileName | sed -n 's/^.*\///p') # Extract nV FW filename
-        URL="https://download.nvidia.com/XFree86/Linux-x86_64/$NVVersion/$RunFlName"
+        URL="$URLBASE/$NVVersion/$RunFlName"
         DebuggedExec "wget -nv -O \"$TEMPFILE\" $URL"
         if [[ $? -ne 0 ]]; then rm "$TEMPFILE" ; return 1; fi
-        echo -ne "${BLUE}Extracting... ${NC}"
+        echo -ne "${BLUE}Extracting...  ${NC}"
         DebuggedExec "sh \"$TEMPFILE\" -x --target /tmp/$FolderNam"
         if [[ $? -ne 0 ]]; then rm "$TEMPFILE"; rm -drf /tmp/$FolderNam ; return 1; fi
         rm "$TEMPFILE"
@@ -117,7 +137,7 @@ function ProcessFirmware(){
 # Here's the main body
 #
 # Let's make sure that we are superuser
-if [[ $EUID -ne 0 ]]; then echo -e "${NL}${RED}Must be run with superuser privileges:${NC} sudo $0 [--debug]${NL}"; exit 1; fi
+if [[ $EUID -ne 0 ]]; then echo -e "${NL}${RED}Must be run with superuser privileges:${NC} sudo $0 [--debug]${NC}${NL}"; exit 1; fi
 #
 # Is there some parameters?
 if [[ $# -ne 0 ]] ; then
@@ -135,16 +155,16 @@ SysArch=$(arch)
 if [[ $DEBUG -eq 1 ]]; then
     case $SysArch in
         "x86_64" )
-            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(64-bit).${NL}";;
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(64-bit).${NC}${NL}";;
         "i686"|"i386"  )
-            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(32-bit).${NL}";;
+            echo -e "${YELLOW}DEBUG: ${BLUE}System architecture is ${CYAN}$SysArch ${BLUE}(32-bit).${NC}${NL}";;
         * )
-            echo -e "${YELLOW}DEBUG WARNING: ${BLUE}Unknown system architecture ${CYAN}$SysArch${BLUE}.${NL}"
+            echo -e "${YELLOW}DEBUG WARNING: ${BLUE}Unknown system architecture ${CYAN}$SysArch${BLUE}.${NC}${NL}"
     esac
 fi
 # Here we call update-initramfs, grep-search it's output for "missing HW" message
 echo -e "${BLUE}Detecting missing FWs. It could take some time, please wait...${NC}${NL}"
-MFWs=$(update-initramfs -u 2>&1 >/dev/null | grep 'Possible missing firmware' | sed -n 's/ for.*$//p') 
+MFWs=$(update-initramfs -u 2>&1 >/dev/null | grep 'Possible missing firmware' | sed -n 's/ for.*$//p')
 #
 MaxLength=0	# Get longest string length - we'll need it later to calculate tabulation
 while IFS= read -r line; do if [[ ${#line} -gt $MaxLength ]]; then MaxLength=${#line}; fi; done < <(echo "$MFWs")
@@ -154,18 +174,26 @@ while IFS= read -r line; do ProcessFirmware "$line"; done < <(echo "$MFWs")
 #
 # Did we found some missing FWs?
 if [[ $FWTotal -eq 0 ]]; then echo -e "${BLUE}No missing FWs found. Nothing to do. Exiting...${NC}${NL}"; exit 0; fi
+# Do we have nVidia errors?
+if [[ $NVidiaErr -eq 1 ]]; then
+    echo -e "${NL}${YELLOW}WARNING: ${CYAN}We got an error while processing nVidia FWs.${NC}"
+    echo -e "${CYAN}Installing nVidia FWs is a bit tricky to automate.${NC}"
+    echo -e "${CYAN}But You can try to do this manually. ${NC}"
+    echo -e "${CYAN}Just visit ${WHITE}https://download.nvidia.com/XFree86/${NC}"
+    echo -e "${CYAN}and download installer for desired architecture and FW version.${NC}"
+fi
 # Is there some successful FWs?
-if [[ $FWSuccs -eq 0 ]]; then		# Nope, no luck
+if [[ $FWSuccs -eq 0 ]]; then       # Nope, no luck
     echo -ne "${NL}${YELLOW}WARNING: No FWs found or downloaded. See messages above"
-    [[ $DEBUG -eq 0 ]] && echo -ne " or try --debug option for more info"
-    echo -ne ". Exiting...${NC}${NL}"
+    [[ $DEBUG -eq 0 ]] && echo -ne "${NL}or try --debug option for more info"
+    echo -ne ". ${NL}Exiting...${NC}${NL}${NL}"
     exit 1
 fi
 # Maybe ALL FWs downloaded with success?
 if [[ $FWSuccs -ne $FWTotal ]]; then	# Nope
-    echo -ne "${NL}${YELLOW}WARNING: Some FWs was not found or not downloaded. See messages above"
-    [[ $DEBUG -eq 1 ]] || echo -ne " or try --debug option for more info"
-    echo -ne ". But You still can regenerate kernels.${NC}${NL}"
+    echo -ne "${NL}${YELLOW}WARNING: Some FWs was not found or downloaded. See messages above"
+    [[ $DEBUG -eq 0 ]] && echo -ne "${NL}or try --debug option for more info"
+    echo -ne ". ${NL}But You still can regenerate kernels.${NC}${NL}"
 fi
 # Now we need to re-generate all kernels
 echo -ne "${NL}${BLUE}It's time to re-generate kernels. Press ${GREEN}Enter ${BLUE}to continue or ${RED}CTRL+C ${BLUE}to skip:${NC}"
