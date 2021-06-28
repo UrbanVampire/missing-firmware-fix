@@ -196,7 +196,7 @@ if [[ $FWSuccs -ne $FWTotal ]]; then	# Nope
     echo -ne ". ${NL}But You still can regenerate kernels.${NC}${NL}"
 fi
 # Now we need to re-generate all kernels
-echo -ne "${NL}${BLUE}It's time to re-generate kernels. Press ${GREEN}Enter ${BLUE}to continue or ${RED}CTRL+C ${BLUE}to skip:${NC}"
+echo -ne "${NL}${WHITE}It's time to re-generate kernels. Press ${GREEN}Enter ${WHITE}to continue or ${RED}CTRL+C ${WHITE}to skip:${NC}"
 read
 echo -e "${NL}${BLUE}Generating kernels. It could take some time, please wait...${NC}${NL}"
 sudo update-initramfs -u -k all | grep 'Generating'
